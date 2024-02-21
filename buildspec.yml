@@ -23,7 +23,6 @@ phases:
   pre_build:
     commands:
       - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
-      - echo AWS Account ID is ${AWS_ACCOUNT_ID}
       - DEPLOY_VERSION_TAG=${BUILD_ENV}-$(date +%Y%m%d-%H%M%S)
       - RELEASE_VERSION=${DEPLOY_VERSION_TAG}
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
@@ -45,6 +44,8 @@ phases:
 
   post_build:
     commands:
+      - echo ${NGINX_IMAGE_URI}:latest ${NGINX_IMAGE_URI}:${DEPLOY_VERSION_TAG}
+      - echo ${PHP_FPM_IMAGE_URI}:latest ${PHP_FPM_IMAGE_URI}:${DEPLOY_VERSION_TAG}
       - docker tag ${NGINX_IMAGE_URI}:latest ${NGINX_IMAGE_URI}:${DEPLOY_VERSION_TAG} 
       - docker tag ${PHP_FPM_IMAGE_URI}:latest ${PHP_FPM_IMAGE_URI}:${DEPLOY_VERSION_TAG} 
       - docker images
