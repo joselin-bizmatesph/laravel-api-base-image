@@ -44,8 +44,6 @@ phases:
 
   post_build:
     commands:
-      - echo ${NGINX_IMAGE_URI}:latest ${NGINX_IMAGE_URI}:${DEPLOY_VERSION_TAG}
-      - echo ${PHP_FPM_IMAGE_URI}:latest ${PHP_FPM_IMAGE_URI}:${DEPLOY_VERSION_TAG}
       - docker tag ${NGINX_IMAGE_URI}:latest ${NGINX_IMAGE_URI}:${DEPLOY_VERSION_TAG} 
       - docker tag ${PHP_FPM_IMAGE_URI}:latest ${PHP_FPM_IMAGE_URI}:${DEPLOY_VERSION_TAG} 
       - docker images
