@@ -1,0 +1,27 @@
+version: '3.7'
+services:
+  nginx:
+    container_name: laravel-nginx
+    init: true
+    build:
+      context: .
+      dockerfile: docker/prod/nginx/Dockerfile
+    ports:
+      - 8080:80
+    volumes:
+      - .:/laravel-project
+  php:
+    container_name: laravel-php
+    init: true
+    environment:
+      - XDG_CONFIG_HOME=/laravel-project/src/storage/logs/
+    build:
+      context: .
+      dockerfile: docker/prod/php/Dockerfile
+      args:
+        PHP_MODE: production
+    volumes:
+      - .:/laravel-project
+volumes:
+  mysql-data:
+    driver: local

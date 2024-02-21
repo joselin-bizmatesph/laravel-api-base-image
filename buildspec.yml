@@ -1,0 +1,74 @@
+version: 0.2
+
+run-as: root
+
+env:
+  variables:
+    DOCKER_BUILDKIT: "1"
+
+    AWS_DEFAULT_REGION: "ap-northeast-1"
+    TASKDEF_NAME: "taskdef.template.json"
+
+    NGINX_APP_NAME: "nginx"
+    NGINX_DOCKER_BUILD_PATH: "."
+
+    PHP_FPM_APP_NAME: "php-fpm"
+    PHP_FPM_DOCKER_BUILD_PATH: "."
+
+phases:
+  install:
+    runtime-versions:
+      docker: 20
+
+  pre_build:
+    commands:
+      - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
+      - DEPLOY_VERSION_TAG=${BUILD_ENV}-$(date +%Y%m%d-%H%M%S)
+      - RELEASE_VERSION=${DEPLOY_VERSION_TAG}
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
+      - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
+      - BLUEGREEN_TASKDEF_FILE_PATH="./docker/${BUILD_ENV}/${TASKDEF_NAME}"
+
+      - NGINX_IMAGE_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/laravel/${NGINX_APP_NAME}"
+      - NGINX_ENVIRONMENT_DIR="./docker/${BUILD_ENV}/nginx"
+
+      - PHP_FPM_IMAGE_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/laravel/${PHP_FPM_APP_NAME}"
+      - PHP_FPM_ENVIRONMENT_DIR="./docker/${BUILD_ENV}/php"
+
+      - echo Deploy version tag is ${RELEASE_VERSION}
+
+  build:
+    commands:
+      - docker build -t ${NGINX_IMAGE_URI}:latest -f ${NGINX_ENVIRONMENT_DIR}/Dockerfile ${NGINX_DOCKER_BUILD_PATH}
+      - docker build -t ${PHP_FPM_IMAGE_URI}:latest -f ${PHP_FPM_ENVIRONMENT_DIR}/Dockerfile ${PHP_FPM_DOCKER_BUILD_PATH}
+
+  post_build:
+    commands:
+      - docker tag ${NGINX_IMAGE_URI}:latest ${NGINX_IMAGE_URI}:${DEPLOY_VERSION_TAG} 
+      - docker tag ${PHP_FPM_IMAGE_URI}:latest ${PHP_FPM_IMAGE_URI}:${DEPLOY_VERSION_TAG} 
+      - docker images
+      - docker push ${NGINX_IMAGE_URI}:${DEPLOY_VERSION_TAG}
+      - docker push ${PHP_FPM_IMAGE_URI}:${DEPLOY_VERSION_TAG}
+      - CurEnvironment=${BUILD_ENV}
+      - |
+        if [ "$CurEnvironment" = "prod" ]; then
+          docker push ${NGINX_IMAGE_URI}:latest
+          docker push ${PHP_FPM_IMAGE_URI}:latest
+        fi
+
+      # [DO NOT EDIT]--------------------------------------------
+      ## (RollingUpdate)
+      - printf '[{"name":"%s","imageUri":"%s"},{"name":"%s","imageUri":"%s"}]' ${NGINX_APP_NAME} ${NGINX_IMAGE_URI}:${RELEASE_VERSION} ${PHP_FPM_APP_NAME} ${PHP_FPM_IMAGE_URI}:${RELEASE_VERSION} > imagedefinitions.json
+      - cat imagedefinitions.json
+      ## (Blue/Green)
+      - TaskdefEscaped=$(sed -e 's|"|\\"|g' ${BLUEGREEN_TASKDEF_FILE_PATH})
+      - |-
+        eval "echo \"${TaskdefEscaped}\"" > taskdef.json
+      - cat taskdef.json
+      # ---------------------------------------------------------
+
+artifacts:
+  files:
+    - imagedefinitions.json
+    - taskdef.json
+    - appspec.yml
