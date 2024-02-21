@@ -1,5 +1,5 @@
 {
-  "family": "bizmates-trainer-backend",
+  "family": "larave",
   "cpu": "1024",
   "memory": "2048",
   "networkMode": "awsvpc",
@@ -19,7 +19,7 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": { 
-          "awslogs-group": "/ecs/bizmates-trainer",
+          "awslogs-group": "/ecs/laravel",
           "awslogs-region": "${AWS_DEFAULT_REGION}", 
           "awslogs-stream-prefix": "backend" 
         }
@@ -192,7 +192,7 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": { 
-          "awslogs-group": "/ecs/bizmates-trainer",
+          "awslogs-group": "/ecs/laravel",
           "awslogs-region": "${AWS_DEFAULT_REGION}", 
           "awslogs-stream-prefix": "backend" 
         }
