@@ -1,0 +1,217 @@
+{
+  "family": "larave",
+  "cpu": "1024",
+  "memory": "2048",
+  "networkMode": "awsvpc",
+  "taskRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/LS_ECSTaskRole_bizmates_trainer_${BUILD_ENV}",
+  "executionRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/LS_ECSTaskExecuteRole_bizmates_trainer_${BUILD_ENV}",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "containerDefinitions": [
+    {
+      "name": "${PHP_FPM_APP_NAME}",
+      "image": "${PHP_FPM_IMAGE_URI}:${RELEASE_VERSION}",
+      "essential": true,
+      "linuxParameters": {
+        "initProcessEnabled": true
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": { 
+          "awslogs-group": "/ecs/laravel",
+          "awslogs-region": "${AWS_DEFAULT_REGION}", 
+          "awslogs-stream-prefix": "backend" 
+        }
+      },
+      "portMappings": [],
+      "environment": [
+        {
+          "name": "APP_ENV",
+          "value": "${BUILD_ENV}"
+        },
+        {
+          "name": "APP_DEBUG",
+          "value": "false"
+        },
+        {
+          "name": "APP_NAME",
+          "value": "TRAINER-BACKEND"
+        },
+        {
+          "name": "APP_URL",
+          "value": "https://trainer.bizmates.jp/"
+        },
+        {
+          "name": "SANCTUM_STATEFUL_DOMAINS",
+          "value": ".bizmates.jp"
+        },
+        {
+          "name": "BIZMATES_BASE_URL",
+          "value": "https://bizmates.jp"
+        },
+        {
+          "name": "DB_HOST",
+          "value": "bizmates-production.cluster-cyaaovhkndru.ap-northeast-1.rds.amazonaws.com"
+        },
+        {
+          "name": "DB_PORT",
+          "value": "3306"
+        },
+        {
+          "name": "DB_DATABASE",
+          "value": "bizmates_new"
+        },
+        {
+          "name": "DB_USERNAME",
+          "value": "bizmates_service"
+        },
+        {
+          "name": "DB_HOST_APPLICANT",
+          "value": "bizmates-production.cluster-cyaaovhkndru.ap-northeast-1.rds.amazonaws.com"
+        },
+        {
+          "name": "DB_PORT_APPLICANT",
+          "value": "3306"
+        },
+        {
+          "name": "DB_DATABASE_APPLICANT",
+          "value": "bizmates_applicant"
+        },
+        {
+          "name": "DB_USERNAME_APPLICANT",
+          "value": "bizmates_service"
+        },
+        {
+          "name": "BIZMATES_TRAINER_BASE_URL",
+          "value": "https://trainer.bizmates.jp"
+        },
+        {
+          "name": "S3_HTML_BASE_BUCKET_URL",
+          "value": "https://dev-lesson-materials.s3.ap-northeast-1.amazonaws.com"
+        },
+        {
+          "name": "MAIL_HOST",
+          "value": "bizmates-trainer-smtp.bizmates.internal"
+        },
+        {
+          "name": "MAIL_PORT",
+          "value": "25"
+        },
+        {
+          "name": "MAIL_ENCRYPTION",
+          "value": "null"
+        },
+        {
+          "name": "MAIL_FROM_ADDRESS",
+          "value": "system.test@bizmates.jp"
+        },
+        {
+          "name": "MAIL_FROM_NAME",
+          "value": "Bizmates Trainer Test"
+        },
+        {
+          "name": "MAILUTIL_SUPER_ADMIN_EMAIL",
+          "value": "super.admin.test@bizmates.jp"
+        },
+        {
+          "name": "MAILUTIL_ADMIN_EMAIL",
+          "value": "admin.test@bizmates.jp"
+        },
+        {
+          "name": "LOG_CHANNEL",
+          "value": "stdout"
+        },
+        {
+          "name": "APPLICANT_BASE_URL",
+          "value": "https://www.bizmates.ph"
+        },
+        {
+          "name": "MYSTAGE_RSA256_PUBLIC_KEY",
+          "value": "arn:aws:secretsmanager:ap-northeast-1:713772266423:secret:prod.mystage.jwt-rsa256.publickey-xKmSEc"
+        },
+        {
+          "name": "MYSTAGE_RSA256_PRIVATE_KEY",
+          "value": "arn:aws:secretsmanager:ap-northeast-1:713772266423:secret:prod.mystage.jwt-rsa256.privatekey-XGUtWN"
+        },
+        {
+          "name": "CHAT_BACKEND_API_URL",
+          "value": "https://csb.bizmates.jp"
+        },
+        {
+          "name": "CHATDB_API_URL",
+          "value": "http://mystage-chat-db-api.bizmates.internal"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "APP_KEY",
+          "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:713772266423:secret:jp.bizmates.prod.trainer.secrets-jdHoCv:APP_KEY::"
+        },
+        {
+          "name": "DB_PASSWORD",
+          "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:713772266423:secret:jp.bizmates.prod.trainer.secrets-jdHoCv:DB_PASSWORD::"
+        },
+        {
+          "name": "DB_PASSWORD_APPLICANT",
+          "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:713772266423:secret:jp.bizmates.prod.trainer.secrets-jdHoCv:DB_PASSWORD::"
+        },
+        {
+          "name": "MAIL_USERNAME",
+          "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:713772266423:secret:jp.bizmates.prod.trainer.secrets-jdHoCv:MAIL_USERNAME::"
+        },
+        {
+          "name": "MAIL_PASSWORD",
+          "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:713772266423:secret:jp.bizmates.prod.trainer.secrets-jdHoCv:MAIL_PASSWORD::"
+        },
+        {
+          "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:713772266423:secret:jp.bizmates.prod.trainer.secrets-jdHoCv:REDIS_HOST::",
+          "name": "REDIS_HOST"
+        },
+        {
+          "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:713772266423:secret:jp.bizmates.prod.trainer.secrets-jdHoCv:REDIS_PASSWORD::",
+          "name": "REDIS_PASSWORD"
+        },
+        {
+          "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:713772266423:secret:jp.bizmates.prod.trainer.secrets-jdHoCv:REDIS_PORT::",
+          "name": "REDIS_PORT"
+        },
+        {
+          "valueFrom": "arn:aws:secretsmanager:ap-northeast-1:713772266423:secret:jp.bizmates.prod.trainer.secrets-jdHoCv:SALT_KEY::",
+          "name": "SALT_KEY"
+        }
+      ]
+    },
+    {
+      "name": "${NGINX_APP_NAME}",
+      "image": "${NGINX_IMAGE_URI}:${RELEASE_VERSION}",
+      "essential": true,
+      "linuxParameters": {
+        "initProcessEnabled": true
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": { 
+          "awslogs-group": "/ecs/laravel",
+          "awslogs-region": "${AWS_DEFAULT_REGION}", 
+          "awslogs-stream-prefix": "backend" 
+        }
+      },
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "protocol": "tcp",
+          "containerPort": 80
+        }
+      ],
+      "environment": [],
+      "secrets": [],
+      "dependsOn": [
+        {
+          "containerName": "${PHP_FPM_APP_NAME}",
+          "condition": "START"
+        }
+      ]
+    }
+  ]
+}

@@ -5,7 +5,7 @@ services:
     init: true
     build:
       context: .
-      dockerfile: docker/prod/nginx/Dockerfile
+      dockerfile: docker/dev/nginx/Dockerfile
     ports:
       - 8081:80
     volumes:
@@ -17,7 +17,7 @@ services:
       - XDG_CONFIG_HOME=/laravel-project/src/storage/logs/
     build:
       context: .
-      dockerfile: docker/prod/php/Dockerfile
+      dockerfile: docker/dev/php/Dockerfile
       args:
         PHP_MODE: production
     volumes:
