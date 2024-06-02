@@ -53,7 +53,7 @@ phases:
       - docker push ${PHP_FPM_IMAGE_URI}:${DEPLOY_VERSION_TAG}
       - CurEnvironment=${build_vars_environment}
       - |
-        if [ "$CurEnvironment" = "prod" ]; then
+        if [ "$CurEnvironment" = "dev" ]; then
           docker push ${NGINX_IMAGE_URI}:latest
           docker push ${PHP_FPM_IMAGE_URI}:latest
         fi
