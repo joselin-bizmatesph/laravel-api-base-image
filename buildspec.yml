@@ -9,12 +9,12 @@ env:
     AWS_DEFAULT_REGION: "ap-southeast-1"
     TASKDEF_NAME: "taskdef.template.json"
 
-    PROJECT_NAME: "selin-tf"
+    PROJECT_NAME: "selin-tf-api"
 
     NGINX_APP_NAME: "nginx"
     NGINX_DOCKER_BUILD_PATH: "."
 
-    PHP_FPM_APP_NAME: "app"
+    PHP_FPM_APP_NAME: "php-fpm"
     PHP_FPM_DOCKER_BUILD_PATH: "."
 
 phases:
