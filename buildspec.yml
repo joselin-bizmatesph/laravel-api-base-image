@@ -25,17 +25,17 @@ phases:
   pre_build:
     commands:
       - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
-      - DEPLOY_VERSION_TAG=${BUILD_ENV}-$(date +%Y%m%d-%H%M%S)
+      - DEPLOY_VERSION_TAG=${build_vars_environment}-$(date +%Y%m%d-%H%M%S)
       - RELEASE_VERSION=${DEPLOY_VERSION_TAG}
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
       - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
-      - BLUEGREEN_TASKDEF_FILE_PATH="./docker/${BUILD_ENV}/${TASKDEF_NAME}"
+      - BLUEGREEN_TASKDEF_FILE_PATH="./docker/${build_vars_environment}/${TASKDEF_NAME}"
 
       - NGINX_IMAGE_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${PROJECT_NAME}/${NGINX_APP_NAME}"
-      - NGINX_ENVIRONMENT_DIR="./docker/${BUILD_ENV}/nginx"
+      - NGINX_ENVIRONMENT_DIR="./docker/${build_vars_environment}/nginx"
 
       - PHP_FPM_IMAGE_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${PROJECT_NAME}/${PHP_FPM_APP_NAME}"
-      - PHP_FPM_ENVIRONMENT_DIR="./docker/${BUILD_ENV}/php"
+      - PHP_FPM_ENVIRONMENT_DIR="./docker/${build_vars_environment}/php"
 
       - echo Deploy version tag is ${RELEASE_VERSION}
 
@@ -51,7 +51,7 @@ phases:
       - docker images
       - docker push ${NGINX_IMAGE_URI}:${DEPLOY_VERSION_TAG}
       - docker push ${PHP_FPM_IMAGE_URI}:${DEPLOY_VERSION_TAG}
-      - CurEnvironment=${BUILD_ENV}
+      - CurEnvironment=${build_vars_environment}
       - |
         if [ "$CurEnvironment" = "prod" ]; then
           docker push ${NGINX_IMAGE_URI}:latest
