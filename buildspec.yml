@@ -6,7 +6,7 @@ env:
   variables:
     DOCKER_BUILDKIT: "1"
 
-    AWS_DEFAULT_REGION: "ap-southeast-1"
+    AWS_DEFAULT_REGION: "ap-northeast-1"
     TASKDEF_NAME: "taskdef.template.json"
 
     PROJECT_NAME: "selin-tf-api"
